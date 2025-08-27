@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Play, Music, FolderOpen, Settings, Search, Home, Library, Headphones, Download, Sparkles } from "lucide-react"
-import { NowPlaying } from "@/components/now-playing"
 import { Settings as SettingsPanel } from "@/components/settings"
 import { getSavedFolders } from "@/lib/folder-access"
 import { usePlayerStore } from "@/lib/stores/player-store"
@@ -256,10 +255,7 @@ export default function HomePage() {
           </Button>
         </div>
       </nav>
-
-      {/* Now Playing Component */}
-      <NowPlaying />
-
+      
       {/* Settings Panel */}
       {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
     </div>

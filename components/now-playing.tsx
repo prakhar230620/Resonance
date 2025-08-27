@@ -171,7 +171,12 @@ export function NowPlaying() {
       {/* Mini Player */}
       {!isNowPlayingOpen && (
         <Card
-          className="fixed bottom-16 left-4 right-4 p-3 bg-card/95 backdrop-blur-sm border-border/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+          className="fixed left-4 right-4 p-3 bg-card/95 backdrop-blur-sm border-border/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            // Place the mini player above the bottom nav (approx 64px) + safe area + small gap
+            bottom: `calc(88px + env(safe-area-inset-bottom, 0px))`,
+            zIndex: 60,
+          }}
           onClick={() => {
             triggerHaptic("light")
             setNowPlayingOpen(true)

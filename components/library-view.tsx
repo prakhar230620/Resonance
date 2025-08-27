@@ -173,30 +173,30 @@ export function LibraryView() {
       <div className="flex-1 overflow-hidden">
         <Tabs value={currentView} onValueChange={handleTabChange} className="h-full">
           <TabsList
-            className="grid w-full grid-cols-4 mx-6 mt-6 h-12 rounded-2xl premium-fade-in"
+            className="flex w-full mx-6 mt-6 h-12 rounded-2xl premium-fade-in overflow-x-auto no-scrollbar gap-2"
             style={{ animationDelay: "200ms" }}
           >
             <TabsTrigger
               value="songs"
-              className="rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
+              className="flex-none px-4 rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
             >
               Songs
             </TabsTrigger>
             <TabsTrigger
               value="artists"
-              className="rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
+              className="flex-none px-4 rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
             >
               Artists
             </TabsTrigger>
             <TabsTrigger
               value="albums"
-              className="rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
+              className="flex-none px-4 rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
             >
               Albums
             </TabsTrigger>
             <TabsTrigger
               value="playlists"
-              className="rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
+              className="flex-none px-4 rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
             >
               Playlists
             </TabsTrigger>

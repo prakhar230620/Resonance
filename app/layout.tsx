@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { AutoRescan } from "@/components/auto-rescan"
 import { BackArrow } from "@/components/back-arrow"
 import { SettingsApplier } from "@/components/settings-applier"
+import { NowPlaying } from "@/components/now-playing"
 
 export const metadata: Metadata = {
   title: "Resonance - Music Player",
@@ -63,6 +64,8 @@ export default function RootLayout({
             <SettingsApplier />
             <BackArrow />
             {children}
+            {/* Global mini player so it works from any page */}
+            <NowPlaying />
             {/* Auto-rescan saved music folders on startup */}
             <AutoRescan />
             <Toaster />
