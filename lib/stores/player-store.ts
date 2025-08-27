@@ -45,6 +45,7 @@ export interface PlayerState {
   // UI state
   isNowPlayingOpen: boolean
   isQueueOpen: boolean
+  isMiniPlayerHidden: boolean
 }
 
 export interface PlayerActions {
@@ -74,6 +75,7 @@ export interface PlayerActions {
   // UI actions
   setNowPlayingOpen: (open: boolean) => void
   setQueueOpen: (open: boolean) => void
+  setMiniPlayerHidden: (hidden: boolean) => void
 
   // Internal state updates
   setCurrentTime: (time: number) => void
@@ -100,6 +102,7 @@ const initialState: PlayerState = {
   crossfadeDuration: 3,
   isNowPlayingOpen: false,
   isQueueOpen: false,
+  isMiniPlayerHidden: false,
 }
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -281,6 +284,10 @@ export const usePlayerStore = create<PlayerStore>()(
         set({ isQueueOpen: open })
       },
 
+      setMiniPlayerHidden: (hidden: boolean) => {
+        set({ isMiniPlayerHidden: hidden })
+      },
+
       setCurrentTime: (time: number) => {
         set({ currentTime: time })
       },
@@ -306,6 +313,7 @@ export const usePlayerStore = create<PlayerStore>()(
         queue: state.queue,
         currentIndex: state.currentIndex,
         currentTrack: state.currentTrack,
+        // Do not persist UI-only flags like isMiniPlayerHidden/isNowPlayingOpen
       }),
     },
   ),

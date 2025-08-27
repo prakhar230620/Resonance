@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
@@ -17,6 +17,8 @@ import {
   Repeat1,
   Shuffle,
   ChevronDown,
+  X,
+  Headphones,
   Heart,
   ListMusic,
   Settings,
@@ -61,6 +63,8 @@ export function NowPlaying() {
     isNowPlayingOpen,
     setNowPlayingOpen,
     setQueueOpen,
+    isMiniPlayerHidden,
+    setMiniPlayerHidden,
     toggleShuffle,
     toggleRepeat,
   } = usePlayerStore()
@@ -74,6 +78,13 @@ export function NowPlaying() {
   const [swipeStart, setSwipeStart] = useState<{ x: number; y: number } | null>(null)
   const [isSwipeActive, setIsSwipeActive] = useState(false)
   const playerRef = useRef<HTMLDivElement>(null)
+
+  // Auto-unhide mini player when playback starts or track changes
+  useEffect(() => {
+    if (isMiniPlayerHidden && currentTrack && !isNowPlayingOpen) {
+      setMiniPlayerHidden(false)
+    }
+  }, [currentTrack?.id, isPlaying])
 
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0]
@@ -169,7 +180,7 @@ export function NowPlaying() {
   return (
     <>
       {/* Mini Player */}
-      {!isNowPlayingOpen && (
+      {!isNowPlayingOpen && !isMiniPlayerHidden && (
         <Card
           className="fixed left-4 right-4 p-3 bg-card/95 backdrop-blur-sm border-border/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
           style={{
@@ -200,6 +211,19 @@ export function NowPlaying() {
               <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
             </div>
 
+            {/* Hide mini player */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation()
+                setMiniPlayerHidden(true)
+              }}
+              className="w-9 h-9 transition-all duration-200 hover:scale-110 active:scale-95"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+
             <Button
               variant="ghost"
               size="icon"
@@ -218,6 +242,21 @@ export function NowPlaying() {
             <div className="h-full bg-primary transition-all duration-300 ease-out" style={{ width: `${progress}%` }} />
           </div>
         </Card>
+      )}
+
+      {/* Restore button when mini player is hidden */}
+      {!isNowPlayingOpen && isMiniPlayerHidden && (
+        <Button
+          variant="secondary"
+          className="fixed right-4 px-3 py-2 rounded-full shadow-md bg-card/95 backdrop-blur-sm border border-border/50 text-xs"
+          style={{
+            bottom: `calc(88px + env(safe-area-inset-bottom, 0px))`,
+            zIndex: 50,
+          }}
+          onClick={() => setMiniPlayerHidden(false)}
+        >
+          <Headphones className="w-4 h-4 mr-2" /> Show mini player
+        </Button>
       )}
 
       {/* Full Screen Player */}
