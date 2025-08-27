@@ -40,6 +40,52 @@
   --sidebar-ring: rgba(132, 204, 22, 0.5);
 }
 
+/* Accent mapping: SettingsApplier sets data-accent on <html>. Map to CSS variables used across UI */
+:root[data-accent="purple"] {
+  --sidebar-primary: #6d28d9;
+  --ring: #6d28d980;
+}
+.dark[data-accent="purple"] {
+  --sidebar-primary: #7c3aed;
+  --ring: #7c3aed80;
+}
+
+:root[data-accent="blue"] {
+  --sidebar-primary: #2563eb;
+  --ring: #2563eb80;
+}
+.dark[data-accent="blue"] {
+  --sidebar-primary: #3b82f6;
+  --ring: #3b82f680;
+}
+
+:root[data-accent="green"] {
+  --sidebar-primary: #16a34a;
+  --ring: #16a34a80;
+}
+.dark[data-accent="green"] {
+  --sidebar-primary: #22c55e;
+  --ring: #22c55e80;
+}
+
+:root[data-accent="orange"] {
+  --sidebar-primary: #ea580c;
+  --ring: #ea580c80;
+}
+.dark[data-accent="orange"] {
+  --sidebar-primary: #f97316;
+  --ring: #f9731680;
+}
+
+:root[data-accent="red"] {
+  --sidebar-primary: #dc2626;
+  --ring: #dc262680;
+}
+.dark[data-accent="red"] {
+  --sidebar-primary: #ef4444;
+  --ring: #ef444480;
+}
+
 .dark {
   /* Dark mode tokens optimized for premium music listening experience */
   --background: #0a0e0f; /* Very dark blue-gray for immersive experience */

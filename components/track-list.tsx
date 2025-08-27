@@ -79,6 +79,8 @@ export function TrackList({
       onTrackSelect(track, index)
     } else {
       setQueue(tracks, index)
+      // Immediately start playback so lists like Favorites play via mini player
+      usePlayerStore.getState().play()
     }
   }
 

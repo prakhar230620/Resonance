@@ -366,7 +366,8 @@ class AudioEngine {
         }
       }
 
-      // If no handle is available (file-picker only flow) and src is a stale blob, prompt user to reselect the file
+      // If no handle is available (file-picker only flow) and src is a stale blob, DO NOT open picker automatically.
+      // Instead, notify the user gently. They can re-add files via Add Music.
       if (
         currentTrack &&
         currentTrack.src === src &&
@@ -374,24 +375,11 @@ class AudioEngine {
         (!("fileHandle" in currentTrack) || !currentTrack.fileHandle)
       ) {
         try {
-          const fileList = await createFileInput(false, false)
-          if (fileList && fileList.length > 0) {
-            const file = fileList[0]
-            // Try to match by name/size if we have them
-            const targetName = (currentTrack.filePath || "").split("/").pop() || ""
-            const nameMatches = !targetName || file.name === targetName
-            const sizeMatches = typeof currentTrack.fileSize === "number" ? file.size === currentTrack.fileSize : true
-            if (nameMatches && sizeMatches) {
-              const newUrl = URL.createObjectURL(file)
-              effectiveSrc = newUrl
-              try {
-                useLibraryStore.getState().updateTrack(currentTrack.id, { src: newUrl })
-              } catch {}
-            }
-          }
-        } catch (e) {
-          console.warn("[v0] User did not reselect file / recovery failed:", e)
-        }
+          toast({
+            title: "File needs reconnect",
+            description: "This track's source is no longer available. Re-add files from Add Music to fix.",
+          })
+        } catch {}
       }
 
       // Proactively verify format support to avoid decoder init errors

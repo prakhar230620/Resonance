@@ -23,6 +23,7 @@ export default function PlaylistDetailPage() {
 
   const playlist = playlists[id]
   const [name, setName] = useState<string>(playlist?.name || "")
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
 
   const trackItems = useMemo(() => {
     if (!playlist) return []
@@ -70,6 +71,14 @@ export default function PlaylistDetailPage() {
     play()
   }
 
+  const playFrom = (startIndex: number) => {
+    const { setQueue, play } = usePlayerStore.getState()
+    const items = trackItems
+    if (!items.length) return
+    setQueue(items, startIndex)
+    play()
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -105,9 +114,30 @@ export default function PlaylistDetailPage() {
           <Card className="p-6 text-center text-muted-foreground">No tracks in this playlist yet.</Card>
         ) : (
           trackItems.map((track, index) => (
-            <Card key={track.id} className="p-3 flex items-center gap-3 rounded-2xl">
-              <GripVertical className="w-4 h-4 text-muted-foreground" />
-              <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+            <Card
+              key={track.id}
+              className="p-3 flex items-center gap-3 rounded-2xl"
+              draggable
+              onDragStart={() => setDragIndex(index)}
+              onDragOver={(e) => {
+                e.preventDefault()
+                e.dataTransfer.dropEffect = "move"
+              }}
+              onDrop={() => {
+                if (dragIndex !== null && dragIndex !== index) {
+                  reorderPlaylistTracks(playlist.id, dragIndex, index)
+                }
+                setDragIndex(null)
+              }}
+              onDragEnd={() => setDragIndex(null)}
+            >
+              <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
+              <div
+                className="w-12 h-12 bg-muted rounded-lg overflow-hidden flex items-center justify-center"
+                onClick={() => playFrom(index)}
+                role="button"
+                aria-label={`Play ${track.title}`}
+              >
                 {track.artwork ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={track.artwork} alt={track.title} className="w-full h-full object-cover" />
@@ -115,7 +145,7 @@ export default function PlaylistDetailPage() {
                   <Music className="w-5 h-5 text-muted-foreground" />
                 )}
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 cursor-pointer" onClick={() => playFrom(index)}>
                 <p className="font-medium truncate">{track.title}</p>
                 <p className="text-xs text-muted-foreground truncate">{track.artist} • {track.album}</p>
               </div>

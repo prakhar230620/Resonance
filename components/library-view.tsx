@@ -66,6 +66,7 @@ export function LibraryView() {
     setSortOrder,
     getFilteredTracks,
     getRecentTracks,
+    getFavoriteTracks,
     createPlaylist,
   } = useLibraryStore()
 
@@ -138,11 +139,13 @@ export function LibraryView() {
           />
         </div>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { value: stats.totalTracks, label: "Songs", icon: Music },
             { value: stats.totalArtists, label: "Artists", icon: Sparkles },
             { value: stats.totalAlbums, label: "Albums", icon: Grid },
+            { value: Object.keys(playlists).length, label: "Playlists", icon: List },
+            { value: Object.keys(useLibraryStore.getState().favorites).length, label: "Favorites", icon: Sparkles },
             { value: formatDuration(stats.totalDuration), label: "Duration", icon: List },
           ].map((stat, index) => (
             <Card
@@ -172,6 +175,12 @@ export function LibraryView() {
               className="flex-none px-4 rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
             >
               Songs
+            </TabsTrigger>
+            <TabsTrigger
+              value="favorites"
+              className="flex-none px-4 rounded-xl transition-all duration-200 data-[state=active]:premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
+            >
+              Favorites
             </TabsTrigger>
             <TabsTrigger
               value="artists"
@@ -253,6 +262,56 @@ export function LibraryView() {
                         </Button>
                       </Link>
                     )}
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="favorites" className="mt-0 h-full premium-fade-in">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <Select value={sortBy} onValueChange={(value) => setSortBy(value as any)}>
+                      <SelectTrigger className="w-36 h-10 rounded-xl transition-all duration-200 hover:bg-muted/50">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="title">Title</SelectItem>
+                        <SelectItem value="artist">Artist</SelectItem>
+                        <SelectItem value="album">Album</SelectItem>
+                        <SelectItem value="dateAdded">Date Added</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        triggerHaptic("light")
+                        setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                      }}
+                      className="rounded-xl transition-all duration-200 hover:bg-muted/50 active:bg-muted"
+                    >
+                      {sortOrder === "asc" ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />}
+                    </Button>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground font-medium">{getFavoriteTracks().length} songs</p>
+                </div>
+
+                {isLoading ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <TrackSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : getFavoriteTracks().length > 0 ? (
+                  <TrackList tracks={getFavoriteTracks()} />
+                ) : (
+                  <div className="text-center py-16 premium-fade-in">
+                    <div className="w-24 h-24 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                      <Music className="w-12 h-12 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">No favorites yet</h3>
+                    <p className="text-muted-foreground mb-6">Mark songs as favorite to see them here</p>
                   </div>
                 )}
               </TabsContent>
