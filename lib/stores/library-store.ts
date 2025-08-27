@@ -53,6 +53,7 @@ export interface LibraryState {
   albums: Record<string, Album>
   artists: Record<string, Artist>
   playlists: Record<string, Playlist>
+  favorites: Record<string, true>
 
   // UI State
   currentView: "songs" | "artists" | "albums" | "playlists" | "folders" | "recent" | "favorites"
@@ -88,6 +89,12 @@ export interface LibraryActions {
   addToPlaylist: (playlistId: string, trackIds: string[]) => void
   removeFromPlaylist: (playlistId: string, trackIds: string[]) => void
   updatePlaylist: (playlistId: string, updates: Partial<Playlist>) => void
+  setPlaylistOrder: (playlistId: string, trackIds: string[]) => void
+  reorderPlaylistTracks: (playlistId: string, fromIndex: number, toIndex: number) => void
+
+  // Favorites
+  toggleFavorite: (trackId: string) => void
+  isFavorite: (trackId: string) => boolean
 
   // Search and filtering
   setSearchQuery: (query: string) => void
@@ -117,6 +124,7 @@ const initialState: LibraryState = {
   albums: {},
   artists: {},
   playlists: {},
+  favorites: {},
   currentView: "songs",
   searchQuery: "",
   sortBy: "title",
@@ -361,6 +369,68 @@ export const useLibraryStore = create<LibraryStore>()(
         })
       },
 
+      setPlaylistOrder: (playlistId: string, trackIds: string[]) => {
+        set((state) => {
+          const playlist = state.playlists[playlistId]
+          if (!playlist) return state
+          return {
+            playlists: {
+              ...state.playlists,
+              [playlistId]: {
+                ...playlist,
+                trackIds,
+                updatedAt: new Date(),
+              },
+            },
+          }
+        })
+      },
+
+      reorderPlaylistTracks: (playlistId: string, fromIndex: number, toIndex: number) => {
+        set((state) => {
+          const playlist = state.playlists[playlistId]
+          if (!playlist) return state
+          const ids = [...playlist.trackIds]
+          if (
+            fromIndex < 0 ||
+            toIndex < 0 ||
+            fromIndex >= ids.length ||
+            toIndex >= ids.length ||
+            fromIndex === toIndex
+          )
+            return state
+          const [moved] = ids.splice(fromIndex, 1)
+          ids.splice(toIndex, 0, moved)
+          return {
+            playlists: {
+              ...state.playlists,
+              [playlistId]: {
+                ...playlist,
+                trackIds: ids,
+                updatedAt: new Date(),
+              },
+            },
+          }
+        })
+      },
+
+      toggleFavorite: (trackId: string) => {
+        set((state) => {
+          const isFav = !!state.favorites[trackId]
+          const newFavs = { ...state.favorites }
+          if (isFav) {
+            delete newFavs[trackId]
+          } else {
+            newFavs[trackId] = true
+          }
+          return { favorites: newFavs }
+        })
+      },
+
+      isFavorite: (trackId: string) => {
+        return !!get().favorites[trackId]
+      },
+
       setSearchQuery: (query: string) => {
         set({ searchQuery: query })
       },
@@ -440,9 +510,8 @@ export const useLibraryStore = create<LibraryStore>()(
       },
 
       getFavoriteTracks: () => {
-        const { tracks } = get()
-        // TODO: Implement favorites tracking
-        return Object.values(tracks).filter(() => false)
+        const { tracks, favorites } = get()
+        return Object.values(tracks).filter((t) => !!favorites[t.id])
       },
 
       getMostPlayedTracks: (limit = 20) => {
@@ -494,6 +563,7 @@ export const useLibraryStore = create<LibraryStore>()(
         albums: state.albums,
         artists: state.artists,
         playlists: state.playlists,
+        favorites: state.favorites,
         stats: state.stats,
       }),
     },

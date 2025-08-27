@@ -125,15 +125,6 @@ export function LibraryView() {
             >
               {viewMode === "list" ? <Grid className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-xl"
-              onClick={handleRefresh}
-              disabled={isLoading}
-            >
-              Rescan
-            </Button>
           </div>
         </div>
 
@@ -392,36 +383,55 @@ export function LibraryView() {
                   </Button>
                 </div>
 
-                <div className="space-y-4">
-                  {Object.values(playlists).map((playlist, index) => (
-                    <Card
-                      key={playlist.id}
-                      className="p-5 cursor-pointer hover:bg-muted/50 hover:shadow-lg transition-all duration-200 premium-scale-in rounded-2xl"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                      onClick={() => triggerHaptic("light")}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-accent/20 rounded-2xl flex items-center justify-center shadow-lg">
-                          <span className="text-2xl">🎵</span>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-lg">{playlist.name}</h3>
-                          <p className="text-sm text-muted-foreground">{playlist.trackIds.length} songs</p>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-
-                  {Object.keys(playlists).length === 0 && (
-                    <div className="text-center py-16 premium-fade-in">
-                      <div className="w-24 h-24 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                        <Plus className="w-12 h-12 text-accent" />
-                      </div>
-                      <h3 className="text-xl font-bold mb-2">No playlists yet</h3>
-                      <p className="text-muted-foreground">Create your first playlist to organize your music</p>
+                {Object.keys(playlists).length > 0 ? (
+                  <div
+                    className={cn(
+                      "transition-all duration-300",
+                      viewMode === "grid" ? "grid grid-cols-2 gap-4" : "space-y-4",
+                    )}
+                  >
+                    {Object.values(playlists).map((playlist, index) => (
+                      <Link key={playlist.id} href={`/playlist/${playlist.id}`}>
+                        <Card
+                          className={cn(
+                            "p-5 cursor-pointer hover:bg-muted/50 hover:shadow-lg transition-all duration-200 premium-scale-in rounded-2xl",
+                            viewMode === "grid" && "p-4",
+                          )}
+                          style={{ animationDelay: `${index * 50}ms` }}
+                          onClick={() => triggerHaptic("light")}
+                        >
+                          {viewMode === "grid" ? (
+                            <>
+                              <div className="aspect-square bg-accent/20 rounded-2xl mb-3 flex items-center justify-center shadow-lg">
+                                <span className="text-3xl">🎵</span>
+                              </div>
+                              <h3 className="font-bold text-sm truncate">{playlist.name}</h3>
+                              <p className="text-xs text-muted-foreground">{playlist.trackIds.length} songs</p>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-4">
+                              <div className="w-14 h-14 bg-accent/20 rounded-2xl flex items-center justify-center shadow-lg">
+                                <span className="text-2xl">🎵</span>
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-bold text-lg">{playlist.name}</h3>
+                                <p className="text-sm text-muted-foreground">{playlist.trackIds.length} songs</p>
+                              </div>
+                            </div>
+                          )}
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-16 premium-fade-in">
+                    <div className="w-24 h-24 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                      <Plus className="w-12 h-12 text-accent" />
                     </div>
-                  )}
-                </div>
+                    <h3 className="text-xl font-bold mb-2">No playlists yet</h3>
+                    <p className="text-muted-foreground">Create your first playlist to organize your music</p>
+                  </div>
+                )}
               </TabsContent>
             </div>
           </PullToRefresh>

@@ -44,8 +44,35 @@ export function TrackList({
   onTrackSelect,
 }: TrackListProps) {
   const { currentTrack, isPlaying, setQueue } = usePlayerStore()
-  const { removeTrack } = useLibraryStore()
-  const [selectedTrack, setSelectedTrack] = useState<string | null>(null)
+  const { toggleFavorite, isFavorite } = useLibraryStore()
+
+  const addTrackToPlaylistPrompt = (track: Track) => {
+    const state = useLibraryStore.getState()
+    const playlistEntries = Object.values(state.playlists || {})
+    let chosenId: string | null = null
+
+    if (playlistEntries.length === 0) {
+      const name = typeof window !== "undefined" ? window.prompt("Create new playlist name:") : null
+      if (!name) return
+      chosenId = state.createPlaylist(name)
+    } else {
+      const list = playlistEntries.map((p, i) => `${i + 1}. ${p.name}`).join("\n")
+      const choice = typeof window !== "undefined" ? window.prompt(`Select playlist by number or type new name:\n${list}`) : null
+      if (!choice) return
+      const index = Number(choice)
+      if (!Number.isNaN(index) && index >= 1 && index <= playlistEntries.length) {
+        chosenId = playlistEntries[index - 1].id
+      } else {
+        // treat input as new playlist name
+        chosenId = state.createPlaylist(choice)
+      }
+    }
+
+    if (chosenId) {
+      state.addToPlaylist(chosenId, [track.id])
+      toast({ title: "Added to playlist", description: `${track.title} added successfully` })
+    }
+  }
 
   const handleTrackPlay = (track: Track, index: number) => {
     if (onTrackSelect) {
@@ -187,11 +214,18 @@ export function TrackList({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    toggleFavorite(track.id)
+                    const fav = isFavorite(track.id)
+                    toast({ title: fav ? "Added to Favorites" : "Removed from Favorites", description: track.title })
+                  }}
+                >
                   <Heart className="w-4 h-4 mr-2" />
-                  Add to Favorites
+                  {isFavorite(track.id) ? "Remove from Favorites" : "Add to Favorites"}
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); addTrackToPlaylistPrompt(track) }}>
                   <ListPlus className="w-4 h-4 mr-2" />
                   Add to Playlist
                 </DropdownMenuItem>

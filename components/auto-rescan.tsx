@@ -13,11 +13,6 @@ export function AutoRescan() {
     if (!autoScan) return
     let cancelled = false
 
-    async function run() {
-      await scanSavedFolders()
-    }
-
-    run()
     const onVisibility = () => {
       if (document.visibilityState === "visible" && !cancelled && !isScanning) {
         scanSavedFolders()

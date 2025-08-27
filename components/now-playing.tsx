@@ -19,6 +19,7 @@ import {
   ChevronDown,
   X,
   Headphones,
+  ListPlus,
   Heart,
   ListMusic,
   Settings,
@@ -29,6 +30,8 @@ import { useAudioPlayer } from "@/hooks/use-audio-player"
 import { cn } from "@/lib/utils"
 import { QueueManager } from "./queue-manager"
 import { Settings as SettingsPanel } from "./settings"
+import { useLibraryStore } from "@/lib/stores/library-store"
+import { toast } from "@/hooks/use-toast"
 import { Equalizer } from "./equalizer"
 
 function formatTime(seconds: number): string {
@@ -70,6 +73,7 @@ export function NowPlaying() {
   } = usePlayerStore()
 
   const { togglePlayPause, next, previous, seek, setVolume, toggleMute } = useAudioPlayer()
+  const { toggleFavorite, isFavorite } = useLibraryStore()
 
   const [isDragging, setIsDragging] = useState(false)
   const [dragTime, setDragTime] = useState(0)
@@ -372,7 +376,8 @@ export function NowPlaying() {
             </div>
 
             {/* Secondary Controls */}
-            <div className="flex items-center justify-between mb-4 animate-in fade-in-50 slide-in-from-bottom-4 duration-500 delay-400">
+            <div className="flex items-center justify-center gap-4 mb-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-500 delay-400">
+              {/* Shuffle */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -385,15 +390,59 @@ export function NowPlaying() {
                 <Shuffle className="w-5 h-5" />
               </Button>
 
+              {/* Favorite */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="w-10 h-10 transition-all duration-200 hover:scale-110 active:scale-95 hover:text-red-500"
-                onClick={() => triggerHaptic("light")}
+                className={cn(
+                  "w-10 h-10 transition-all duration-200 hover:scale-110 active:scale-95",
+                  isFavorite(currentTrack.id) && "text-red-500",
+                )}
+                onClick={() => {
+                  triggerHaptic("light")
+                  toggleFavorite(currentTrack.id)
+                  const fav = isFavorite(currentTrack.id)
+                  toast({ title: fav ? "Added to Favorites" : "Removed from Favorites", description: currentTrack.title })
+                }}
               >
                 <Heart className="w-5 h-5" />
               </Button>
 
+              {/* Add to Playlist */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  triggerHaptic("light")
+                  const state = useLibraryStore.getState()
+                  const playlistEntries = Object.values(state.playlists || {})
+                  let chosenId: string | null = null
+                  if (playlistEntries.length === 0) {
+                    const name = typeof window !== "undefined" ? window.prompt("Create new playlist name:") : null
+                    if (!name) return
+                    chosenId = state.createPlaylist(name)
+                  } else {
+                    const list = playlistEntries.map((p, i) => `${i + 1}. ${p.name}`).join("\n")
+                    const choice = typeof window !== "undefined" ? window.prompt(`Select playlist by number or type new name:\n${list}`) : null
+                    if (!choice) return
+                    const index = Number(choice)
+                    if (!Number.isNaN(index) && index >= 1 && index <= playlistEntries.length) {
+                      chosenId = playlistEntries[index - 1].id
+                    } else {
+                      chosenId = state.createPlaylist(choice)
+                    }
+                  }
+                  if (chosenId) {
+                    state.addToPlaylist(chosenId, [currentTrack.id])
+                    toast({ title: "Added to playlist", description: `${currentTrack.title} added successfully` })
+                  }
+                }}
+                className="w-10 h-10 transition-all duration-200 hover:scale-110 active:scale-95"
+              >
+                <ListPlus className="w-5 h-5" />
+              </Button>
+
+              {/* Equalizer */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -406,6 +455,7 @@ export function NowPlaying() {
                 <Sliders className="w-5 h-5" />
               </Button>
 
+              {/* Queue */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -418,6 +468,7 @@ export function NowPlaying() {
                 <ListMusic className="w-5 h-5" />
               </Button>
 
+              {/* Repeat */}
               <Button
                 variant="ghost"
                 size="icon"
