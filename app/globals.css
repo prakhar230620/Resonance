@@ -1,0 +1,230 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated color tokens to premium minimalistic design with psychological color choices */
+  --background: #ecfeff; /* Light cyan for a soft, calming background */
+  --foreground: #164e63; /* Deep cyan for sophisticated text */
+  --card: #ffffff; /* Pure white cards for premium feel */
+  --card-foreground: #164e63; /* Deep cyan text on cards */
+  --popover: #ffffff; /* White popover background */
+  --popover-foreground: #475569; /* Dark gray text on popovers */
+  --primary: #164e63; /* Deep cyan primary - evokes calmness and focus */
+  --primary-foreground: #ffffff; /* White text on primary */
+  --secondary: #84cc16; /* Bright green secondary - represents energy and vitality */
+  --secondary-foreground: #ffffff; /* White text on secondary */
+  --muted: #f0fdf4; /* Very light green muted background */
+  --muted-foreground: #475569; /* Dark gray text in muted sections */
+  --accent: #84cc16; /* Bright green accent for interactive elements */
+  --accent-foreground: #ffffff; /* White text on accent */
+  --destructive: #be123c; /* Rose red for destructive actions */
+  --destructive-foreground: #ffffff; /* White text on destructive */
+  --border: #d1d5db; /* Light gray borders */
+  --input: #ffffff; /* White input backgrounds */
+  --ring: rgba(132, 204, 22, 0.5); /* Soft green focus ring */
+  --chart-1: #15803d; /* Deep green */
+  --chart-2: #164e63; /* Deep cyan */
+  --chart-3: #ec4899; /* Pink accent */
+  --chart-4: #84cc16; /* Bright green */
+  --chart-5: #be123c; /* Rose red */
+  --radius: 0.75rem; /* Increased radius for premium feel */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #475569;
+  --sidebar-primary: #164e63;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #84cc16;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #d1d5db;
+  --sidebar-ring: rgba(132, 204, 22, 0.5);
+}
+
+.dark {
+  /* Dark mode tokens optimized for premium music listening experience */
+  --background: #0a0e0f; /* Very dark blue-gray for immersive experience */
+  --foreground: #f8fafc; /* Off-white for comfortable reading */
+  --card: #1e293b; /* Dark slate cards with depth */
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  --primary: #0891b2; /* Brighter cyan in dark mode for better contrast */
+  --primary-foreground: #f8fafc;
+  --secondary: #65a30d; /* Slightly muted green in dark mode */
+  --secondary-foreground: #f8fafc;
+  --muted: #334155; /* Medium slate for muted sections */
+  --muted-foreground: #94a3b8; /* Light slate gray for muted text */
+  --accent: #84cc16; /* Bright green accent remains vibrant */
+  --accent-foreground: #0a0e0f;
+  --destructive: #dc2626; /* Brighter red in dark mode */
+  --destructive-foreground: #f8fafc;
+  --border: #334155; /* Medium slate borders */
+  --input: #1e293b; /* Dark slate input backgrounds */
+  --ring: rgba(132, 204, 22, 0.6); /* Slightly more visible focus ring */
+  --chart-1: #22c55e;
+  --chart-2: #0891b2;
+  --chart-3: #f472b6;
+  --chart-4: #84cc16;
+  --chart-5: #dc2626;
+  --sidebar: #0a0e0f;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #0891b2;
+  --sidebar-primary-foreground: #f8fafc;
+  --sidebar-accent: #84cc16;
+  --sidebar-accent-foreground: #0a0e0f;
+  --sidebar-border: #334155;
+  --sidebar-ring: rgba(132, 204, 22, 0.6);
+}
+
+@theme inline {
+  /* Updated font configuration for premium typography */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* Enhanced mobile-optimized base styles for premium experience */
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Enhanced safe area utilities for premium mobile experience */
+  .safe-area-inset {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-area-top {
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+  }
+}
+
+/* Enhanced PWA-specific styles for premium standalone experience */
+@media (display-mode: standalone) {
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    background: var(--background);
+  }
+
+  /* Premium glass morphism effect for standalone mode */
+  .glass-effect {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Premium custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary), var(--accent));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--accent), var(--primary));
+}
+
+/* Premium animation utilities */
+@keyframes premium-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes premium-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.premium-fade-in {
+  animation: premium-fade-in 0.3s ease-out;
+}
+
+.premium-scale-in {
+  animation: premium-scale-in 0.2s ease-out;
+}
+
+/* Premium gradient utilities */
+.premium-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.premium-gradient-text {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

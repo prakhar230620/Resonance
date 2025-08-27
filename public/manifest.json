@@ -1,0 +1,76 @@
+{
+  "name": "Resonance - Premium Music Player",
+  "short_name": "Resonance",
+  "description": "Premium offline-first PWA music player with luxurious design and advanced audio features",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#164e63",
+  "theme_color": "#164e63",
+  "orientation": "portrait-primary",
+  "categories": ["music", "entertainment", "multimedia"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add Music",
+      "short_name": "Add Music",
+      "description": "Add music folders to your library",
+      "url": "/add-music",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Library",
+      "short_name": "Library",
+      "description": "Browse your music library",
+      "url": "/library",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "features": ["offline-first", "background-audio", "file-system-access", "media-session"],
+  "prefer_related_applications": false
+}
