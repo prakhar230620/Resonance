@@ -1,5 +1,6 @@
 import { usePlayerStore } from "./stores/player-store"
-import { checkAudioSupport, getAudioMimeType } from "./file-system"
+import { useLibraryStore } from "./stores/library-store"
+import { checkAudioSupport, getAudioMimeType, createFileInput } from "./file-system"
 import { useSettingsStore } from "./stores/settings-store"
 import { EQUALIZER_FREQUENCIES, type EqualizerPreset } from "./audio-effects"
 import { toast } from "@/hooks/use-toast"
@@ -340,9 +341,62 @@ class AudioEngine {
         return
       }
 
+      // If the source is a persisted blob URL (from previous session), it may be stale.
+      // If we have a FileSystem handle, recreate a fresh object URL for reliable playback.
+      const state = usePlayerStore.getState()
+      const currentTrack = state.currentTrack
+      let effectiveSrc = src
+      if (
+        currentTrack &&
+        currentTrack.src === src &&
+        src.startsWith("blob:") &&
+        typeof currentTrack.fileHandle !== "undefined" &&
+        currentTrack.fileHandle
+      ) {
+        try {
+          const file = await currentTrack.fileHandle.getFile()
+          const newUrl = URL.createObjectURL(file)
+          effectiveSrc = newUrl
+          // Update library store so the track entry references a fresh URL
+          try {
+            useLibraryStore.getState().updateTrack(currentTrack.id, { src: newUrl })
+          } catch {}
+        } catch (e) {
+          console.warn("[v0] Failed to recreate object URL from file handle:", e)
+        }
+      }
+
+      // If no handle is available (file-picker only flow) and src is a stale blob, prompt user to reselect the file
+      if (
+        currentTrack &&
+        currentTrack.src === src &&
+        src.startsWith("blob:") &&
+        (!("fileHandle" in currentTrack) || !currentTrack.fileHandle)
+      ) {
+        try {
+          const fileList = await createFileInput(false, false)
+          if (fileList && fileList.length > 0) {
+            const file = fileList[0]
+            // Try to match by name/size if we have them
+            const targetName = (currentTrack.filePath || "").split("/").pop() || ""
+            const nameMatches = !targetName || file.name === targetName
+            const sizeMatches = typeof currentTrack.fileSize === "number" ? file.size === currentTrack.fileSize : true
+            if (nameMatches && sizeMatches) {
+              const newUrl = URL.createObjectURL(file)
+              effectiveSrc = newUrl
+              try {
+                useLibraryStore.getState().updateTrack(currentTrack.id, { src: newUrl })
+              } catch {}
+            }
+          }
+        } catch (e) {
+          console.warn("[v0] User did not reselect file / recovery failed:", e)
+        }
+      }
+
       // Proactively verify format support to avoid decoder init errors
       try {
-        await this.ensureFormatSupported(src)
+        await this.ensureFormatSupported(effectiveSrc)
       } catch (supportErr) {
         console.error("[v0] Unsupported audio format:", supportErr)
         usePlayerStore.getState().setIsPlaying(false)
@@ -382,7 +436,7 @@ class AudioEngine {
         this.audio!.addEventListener("loadedmetadata", onLoad, { once: true })
         this.audio!.addEventListener("error", onError, { once: true })
 
-        this.audio!.src = src
+        this.audio!.src = effectiveSrc
         this.audio!.load()
       })
 
