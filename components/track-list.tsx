@@ -80,7 +80,8 @@ export function TrackList({
       useLibraryStore.getState().removeTrack(track.id)
       toast({ title: "Deleted", description: `${name} removed from library and disk` })
     } catch (e: any) {
-      toast({ title: "Delete failed", description: String(e), variant: "destructive" })
+      console.error("Delete failed:", e)
+      toast({ title: "Delete failed", description: "We couldn't delete this file. Please try again.", variant: "destructive" })
     }
   }
 
@@ -98,7 +99,8 @@ export function TrackList({
       }
       await navigator.share(data)
     } catch (e: any) {
-      toast({ title: "Share failed", description: String(e), variant: "destructive" })
+      console.error("Share failed:", e)
+      toast({ title: "Share failed", description: "Unable to share this track on your device.", variant: "destructive" })
     }
   }
 

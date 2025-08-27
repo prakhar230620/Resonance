@@ -27,6 +27,29 @@ class AudioEngine {
     this.setupMediaSession()
   }
 
+  // Centralized, user-friendly error notifications (no URLs or low-level details)
+  private notifyUserError(kind: "unsupported" | "network" | "permission" | "load" | "play" | "unknown") {
+    const titles: Record<string, string> = {
+      unsupported: "Can't play this file",
+      network: "Network issue",
+      permission: "Playback blocked",
+      load: "Playback error",
+      play: "Playback error",
+      unknown: "Playback error",
+    }
+    const descriptions: Record<string, string> = {
+      unsupported: "This audio format isn't supported on your device.",
+      network: "Please check your connection and try again.",
+      permission: "Tap the play button to resume.",
+      load: "We couldn't load the track. Please try again.",
+      play: "We couldn't start playback. Please try again.",
+      unknown: "Something went wrong while playing this track.",
+    }
+    try {
+      toast({ title: titles[kind], description: descriptions[kind], variant: "destructive" })
+    } catch {}
+  }
+
   private setupAudioElement() {
     if (!this.audio) return
     const audio = this.audio
@@ -100,43 +123,16 @@ class AudioEngine {
 
     audio.addEventListener("error", (e) => {
       const error = audio.error || null
-      let errorMessage = "Unknown audio error"
-
       if (error) {
-        switch (error.code) {
-          case MediaError.MEDIA_ERR_ABORTED:
-            errorMessage = "Audio playback was aborted"
-            break
-          case MediaError.MEDIA_ERR_NETWORK:
-            errorMessage = "Network error occurred while loading audio"
-            break
-          case MediaError.MEDIA_ERR_DECODE:
-            errorMessage = "Audio decoding error - unsupported format"
-            break
-          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-            errorMessage = "Audio source not supported"
-            break
-          default:
-            errorMessage = `Audio error code: ${error.code}`
-        }
-
-        console.error("[v0] Audio error:", errorMessage, "Details:", error.message || "No additional details")
-        try {
-          toast({
-            title: "Playback error",
-            description: errorMessage,
-            variant: "destructive",
-          })
-        } catch {}
+        // Log technicals to console only
+        console.error("[v0] Audio error:", error.code, error.message)
+        if (error.code === MediaError.MEDIA_ERR_NETWORK) this.notifyUserError("network")
+        else if (error.code === MediaError.MEDIA_ERR_DECODE) this.notifyUserError("unsupported")
+        else if (error.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) this.notifyUserError("unsupported")
+        else this.notifyUserError("unknown")
       } else {
-        console.error("[v0] Audio error event:", e.type, "Target:", e.target)
-        try {
-          toast({
-            title: "Playback error",
-            description: "An unknown audio error occurred.",
-            variant: "destructive",
-          })
-        } catch {}
+        console.error("[v0] Audio error event:", e.type)
+        this.notifyUserError("unknown")
       }
 
       usePlayerStore.getState().setIsPlaying(false)
@@ -399,13 +395,14 @@ class AudioEngine {
     } catch (error) {
       console.error("[v0] Failed to load track:", error)
       usePlayerStore.getState().setIsPlaying(false)
-      try {
-        toast({
-          title: "Playback error",
-          description: error instanceof Error ? error.message : "Failed to load audio",
-          variant: "destructive",
-        })
-      } catch {}
+      // Show a generic message to the user, keep details in console
+      if (error instanceof Error && /not supported/i.test(error.message)) {
+        this.notifyUserError("unsupported")
+      } else if (error instanceof Error && /network/i.test(error.message)) {
+        this.notifyUserError("network")
+      } else {
+        this.notifyUserError("load")
+      }
       throw error
     }
   }
@@ -458,10 +455,12 @@ class AudioEngine {
         if (error.name === "NotAllowedError") {
           console.warn("[v0] Autoplay blocked - user interaction required")
           // Don't throw, just log the warning
+          this.notifyUserError("permission")
           return
         }
       }
 
+      this.notifyUserError("play")
       throw error
     }
   }
